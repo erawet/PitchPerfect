@@ -31,13 +31,8 @@ class RecodeSoundViewController: UIViewController, AVAudioRecorderDelegate {
     
     @IBAction func recodeAudio(_ sender: AnyObject) {
         print("recode button wea pressed")
+ 
         recodingStatus(status: false)
-        stopRecodingButton.isEnabled = true
-        stopRecodingButton.isHidden = false
-        
-        recodeButton.isEnabled = false
-        recodeButton.isHidden = true
-        
         let dirPath = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask, true)[0] as String
         let recordingName = "recordedVoice.wav"
         let pathArray = [dirPath, recordingName]
@@ -54,12 +49,8 @@ class RecodeSoundViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     @IBAction func stopRecoding(_ sender: AnyObject) {
-        recodeButton.isEnabled = true
-        recodeButton.isHidden = false
-        
-        stopRecodingButton.isEnabled = false
-        stopRecodingButton.isHidden = true
-        
+
+        recodingStatus(status: true)
         audioRecorder.stop()
         let audioSession = AVAudioSession.sharedInstance()
         try! audioSession.setActive(false)
@@ -69,6 +60,7 @@ class RecodeSoundViewController: UIViewController, AVAudioRecorderDelegate {
         if flag {
            performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
         } else {
+             alertController()
             print("recoding was not successful")
         }
         
@@ -85,9 +77,35 @@ class RecodeSoundViewController: UIViewController, AVAudioRecorderDelegate {
     func recodingStatus(status: Bool){
         if status {
             infoLabel.text = "TAP TO START RECODING"
+            recodeButton.isEnabled = true
+            recodeButton.isHidden = false
+            stopRecodingButton.isEnabled = false
+            stopRecodingButton.isHidden = true
         } else{
             infoLabel.text = "TAP TO FINISH RECODING"
+            stopRecodingButton.isEnabled = true
+            stopRecodingButton.isHidden = false
+            recodeButton.isEnabled = false
+            recodeButton.isHidden = true
+           
         }
+    }
+    
+    func alertController(){
+        
+        let alert = UIAlertController(title: "Recoding Error", message: "Unable to recode due to an error. Please try again", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+            switch action.style{
+            case .default:
+                print("default")
+                
+            case .cancel:
+                print("cancel")
+                
+            case .destructive:
+                print("destructive")
+            }}))
+        self.present(alert, animated: true, completion: nil)
     }
     
 }
